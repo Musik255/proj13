@@ -9,21 +9,23 @@ import UIKit
 
 class DetailViewController: UIViewController, AwesomeDelegate {
     
-   
-    
-
     var awesomeDelegate : AwesomeDelegate
-    
-    func save(data: String) {
-        awesomeDelegate.save(data: data)
-    }
-    
-    
     var imagePath : String!
-    var imageName : UITextField!
-
-    init(_ awesomeDelegate: AwesomeDelegate) {
+    var person : Person
+    var imageName : String
+    var textField : UITextField!
+    
+    
+    init(awesomeDelegate: AwesomeDelegate, person: Person) {
         self.awesomeDelegate = awesomeDelegate
+        self.person = person
+        
+        
+//        let imagePath = getDocumentDirectory().appendingPathComponent(person.imagePath)
+//        detail.imagePath = imagePath.path
+//        self.imagePath = person.imagePath
+        
+        self.imageName = person.name
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,13 +33,12 @@ class DetailViewController: UIViewController, AwesomeDelegate {
         fatalError("init(coder:) is not supported")
     }
     
-//    required init?(coder aDecoder: NSCoder) {
-//        super.init(coder: aDecoder)
-//    }
+    
     
     override func loadView() {
-//        let namePhoto = UIButton(type: .system)
-        
+
+        let imageURL = getDocumentDirectory().appendingPathComponent(person.imagePath)
+        imagePath = imageURL.path
         
         view = UIView()
         view.backgroundColor = .lightGray
@@ -48,13 +49,13 @@ class DetailViewController: UIViewController, AwesomeDelegate {
         
         imagePhoto.translatesAutoresizingMaskIntoConstraints = false
         
-        imageName = UITextField()
-        imageName.translatesAutoresizingMaskIntoConstraints = false
-        imageName.placeholder = "err"
-        imageName.textAlignment = .center
-        imageName.font = UIFont.systemFont(ofSize: 44)
+        textField = UITextField()
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.placeholder = imageName
+        textField.textAlignment = .center
+        textField.font = UIFont.systemFont(ofSize: 44)
 //        imageName.isUserInteractionEnabled = false
-        imageName.borderStyle = .line
+        textField.borderStyle = .line
         
         
         
@@ -73,7 +74,7 @@ class DetailViewController: UIViewController, AwesomeDelegate {
 //        submitButton.addTarget(self, action: #selector(submitTapped), for: .touchUpInside)
         
         view.addSubview(imagePhoto)
-        view.addSubview(imageName)
+        view.addSubview(textField)
         view.addSubview(renameButton)
         NSLayoutConstraint.activate([
             
@@ -83,13 +84,13 @@ class DetailViewController: UIViewController, AwesomeDelegate {
             imagePhoto.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             imagePhoto.heightAnchor.constraint(equalTo: imagePhoto.widthAnchor),
             
-            imageName.bottomAnchor.constraint(equalTo: imagePhoto.topAnchor, constant: -10),
-            imageName.widthAnchor.constraint(equalTo:  imagePhoto.widthAnchor, multiplier: 0.8),
-            imageName.heightAnchor.constraint(equalToConstant: 80),
-            imageName.leadingAnchor.constraint(equalTo: imagePhoto.leadingAnchor),
+            textField.bottomAnchor.constraint(equalTo: imagePhoto.topAnchor, constant: -10),
+            textField.widthAnchor.constraint(equalTo:  imagePhoto.widthAnchor, multiplier: 0.8),
+            textField.heightAnchor.constraint(equalToConstant: 80),
+            textField.leadingAnchor.constraint(equalTo: imagePhoto.leadingAnchor),
             renameButton.widthAnchor.constraint(equalTo:  imagePhoto.widthAnchor, multiplier: 0.2),
-            renameButton.heightAnchor.constraint(equalTo: imageName.heightAnchor),
-            renameButton.bottomAnchor.constraint(equalTo: imageName.bottomAnchor),
+            renameButton.heightAnchor.constraint(equalTo: textField.heightAnchor),
+            renameButton.bottomAnchor.constraint(equalTo: textField.bottomAnchor),
             renameButton.trailingAnchor.constraint(equalTo: imagePhoto.trailingAnchor)
         
         ])
@@ -97,53 +98,22 @@ class DetailViewController: UIViewController, AwesomeDelegate {
     
     @objc func renameTapped(_ sender: UIButton){
         
-        guard let renameText = imageName.text else { return }
-        if renameText == ""{
+        guard let rename = textField.text else { return }
+        if rename == ""{
             return
         }
+        renamePerson(imagePath: person.imagePath, newImageName: rename)
         
-       
-//        print(renameText)
-        save(data: renameText)
-        
-         
-//        if let solutionPosition = solutions.firstIndex(of: answerText){
-//            
-//            solutions[solutionPosition] = ""
-//            activatedButtons.removeAll()
-//            
-//            var splitAnswers = answersLabel.text?.components(separatedBy: "\n")
-//            splitAnswers?[solutionPosition] = answerText
-//            answersLabel.text = splitAnswers?.joined(separator: "\n")
-//            
-//            imageName.text = ""
-//            score += 1
-//            
-//            
-//            for solution in solutions {
-//                if solution != ""{
-//                     return
-//                }
-//                
-//            }
-//            
-//            let alertController = UIAlertController(title: "Супер! Все слова отгаданы!", message: "Готовы приступить к следующему уровню?", preferredStyle: .alert)
-//            alertController.addAction(UIAlertAction(title: "Поехали!", style: .default, handler: levelUp))
-//            present(alertController, animated: true)
-//            
-//        }
-//        else{
-//            let alertController = UIAlertController(title: "Ошибка", message: "Такое слово не было загадано", preferredStyle: .alert)
-//            alertController.addAction(UIAlertAction(title: "Попробовать еще раз", style: .default))
-//            imageName.text = ""
-//            
-//            for button in activatedButtons{
-//                button.isHidden = false
-//            }
-//            activatedButtons.removeAll()
-//            score -= 1
-//            present(alertController, animated: true)
-//        }
-//        
     }
+    
+    func renamePerson(imagePath : String, newImageName : String) {
+        awesomeDelegate.renamePerson(imagePath: imagePath, newImageName: newImageName)
+    }
+    
+    func getDocumentDirectory() -> URL{
+        let path = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return path[0]
+    }
+    
+    
 }

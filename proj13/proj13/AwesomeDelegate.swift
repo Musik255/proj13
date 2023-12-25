@@ -2,5 +2,5 @@ import Foundation
 
 
 protocol AwesomeDelegate{
-    func save(data : String)
+    func renamePerson(imagePath : String, newImageName : String)
 }
